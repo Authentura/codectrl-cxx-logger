@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include "backtrace_data.h"
 
@@ -9,7 +9,7 @@ template <typename T>
 struct Log {
     std::vector<BacktraceData> stack;
     uint32_t line_number;
-    std::unordered_map<uint32_t, std::string> code_snippet;
+    std::map<uint32_t, std::string> code_snippet;
     std::string message;
     std::string message_type;
     std::string file_name;

@@ -16,7 +16,7 @@ struct Log {
     std::string address;
     std::vector<std::string> warnings;
 
-    Log(T message,
+    Log(std::string message,
         int surround = 3,
         std::string host = "127.0.0.1",
         std::string port = "3001")

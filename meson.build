@@ -18,7 +18,6 @@ subdir('include')
 subdir('src')
 subdir('tests')
 
-
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
     libraries: codectrl_logger,

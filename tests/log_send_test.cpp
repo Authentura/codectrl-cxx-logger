@@ -1,7 +1,10 @@
 #include <iostream>
+#include "codectrl/log.h"
 
 int main() {
-    std::cout << "Hello, world!" << std::endl;
+    CodeCtrl::log::Log<std::string> logger;
+
+    logger.log("hello world");
 
     return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+namespace CodeCtrl::data {
 struct BacktraceData {
     std::string name;
     std::string file_path;
@@ -8,3 +9,4 @@ struct BacktraceData {
     uint32_t column_number;
     std::string code;
 };
+}  // namespace CodeCtrl::data

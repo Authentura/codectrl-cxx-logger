@@ -8,10 +8,13 @@ project('codectrl', 'cpp',
 emails = ['<contact@pwnctrl.com>', '<s.boyden@pwnctrl.com>']
 description = 'The codeCTRL logger library for C++'
 
-include = include_directories(['./include', './third_party/asio/asio/include'])
+subdir('third_party')
+
+include = include_directories(
+    third_party_includes + ['./include',]
+)
 
 subdir('include')
-subdir('third_party')
 subdir('src')
 
 

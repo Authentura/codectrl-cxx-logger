@@ -16,6 +16,7 @@ include = include_directories(
 
 subdir('include')
 subdir('src')
+subdir('tests')
 
 
 pkg_mod = import('pkgconfig')

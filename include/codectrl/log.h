@@ -26,16 +26,15 @@ struct Log {
     int surround;
 
    public:
-    Log(std::string message,
-        int surround = 3,
-        std::string host = "127.0.0.1",
-        uint32_t port = 3001);
+    Log(int surround = 3, std::string host = "127.0.0.1", uint32_t port = 3001);
 
-    std::optional<asio::error_code> log();
+    std::optional<asio::error_code> log(std::string message);
 
    private:
     void get_stack_trace();
-    void get_code();
-    void get_code_snippet();
+    static void get_code(std::string file_path, uint32_t line_number);
+    static void get_code_snippet(std::string file_path,
+                                 uint32_t line_number,
+                                 uint32_t surround);
 };
 }  // namespace CodeCtrl::log

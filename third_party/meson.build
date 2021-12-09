@@ -1,4 +1,14 @@
 third_party_includes = [
     './third_party/asio/asio/include',
-    './third_party/jsoncons/include'
+    './third_party/boost_array/include',
+    './third_party/boost_assert/include',
+    './third_party/boost_config/include',
+    './third_party/boost_container_hash/include',
+    './third_party/boost_core/include',
+    './third_party/boost_predef/include',
+    './third_party/boost_stacktrace/include',
+    './third_party/boost_static_assert/include',
+    './third_party/boost_throw_exception/include',
+    './third_party/boost_type_traits/include',
+    './third_party/jsoncons/include',
 ]

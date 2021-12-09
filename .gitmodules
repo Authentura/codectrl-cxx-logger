@@ -4,3 +4,33 @@
 [submodule "third_party/jsoncons"]
 	path = third_party/jsoncons
 	url = https://github.com/danielaparker/jsoncons/
+[submodule "third_party/boost_stacktrace"]
+	path = third_party/boost_stacktrace
+	url = https://github.com/boostorg/stacktrace
+[submodule "third_party/boost_config"]
+	path = third_party/boost_config
+	url = https://github.com/boostorg/config
+[submodule "third_party/boost_core"]
+	path = third_party/boost_core
+	url = https://github.com/boostorg/core
+[submodule "third_party/boost_predef"]
+	path = third_party/boost_predef
+	url = https://github.com/boostorg/predef
+[submodule "third_party/boost_static_assert"]
+	path = third_party/boost_static_assert
+	url = https://github.com/boostorg/static_assert
+[submodule "third_party/boost_type_traits"]
+	path = third_party/boost_type_traits
+	url = https://github.com/boostorg/type_traits
+[submodule "third_party/boost_array"]
+	path = third_party/boost_array
+	url = https://github.com/boostorg/array
+[submodule "third_party/boost_assert"]
+	path = third_party/boost_assert
+	url = https://github.com/boostorg/assert
+[submodule "third_party/boost_throw_exception"]
+	path = third_party/boost_throw_exception
+	url = https://github.com/boostorg/throw_exception
+[submodule "third_party/boost_container_hash"]
+	path = third_party/boost_container_hash
+	url = https://github.com/boostorg/container_hash

@@ -2,9 +2,9 @@
 #include "codectrl/log.h"
 
 int main() {
-    CodeCtrl::log::Log<std::string> logger;
+    CodeCtrl::Log<std::string> logger;
 
-    logger.log("hello world");
+    logger.log("Hello, world!");
 
     return 0;
 }

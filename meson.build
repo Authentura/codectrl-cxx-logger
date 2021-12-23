@@ -19,16 +19,4 @@ include = include_directories(
 )
 
 subdir('include')
-subdir('src')
 subdir('tests')
-
-pkg_mod = import('pkgconfig')
-pkg_mod.generate(
-    libraries: codectrl_logger,
-    name: 'lib' + meson.project_name(),
-    version: meson.project_version(),
-    filebase: meson.project_name(),
-    subdirs: 'pwnctrl',
-    url: 'https://github.com/pwnCTRL/codectrl-cxx-logger',
-    description: description
-)

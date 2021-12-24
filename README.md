@@ -7,7 +7,6 @@ is C++17.
 
 Use the `make` command for the following actions:
 
-- `make build`: To build the library using meson and ninja.
 - `make configure`: To configure the library using
   meson.
 - `make reconfigure`: To reconfigure the library using meson.
@@ -19,3 +18,10 @@ Use the `make` command for the following actions:
 By default, the build output will be place inside `build`. `compile_commands.json` assumes
 that the build output is inside `build` and will not work properly if the build output is
 changed.
+
+### Important information
+
+For *nix systems (i.e. Linux, BSD, macOS) and MinGW:
+
+- Requires `BOOST_STACKTRACE_USE_ADDR2LINE` to be enabled.
+- Requires `libdl` to be linked.

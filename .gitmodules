@@ -34,3 +34,12 @@
 [submodule "third_party/boost_container_hash"]
 	path = third_party/boost_container_hash
 	url = https://github.com/boostorg/container_hash
+[submodule "third_party/boost_type_index"]
+	path = third_party/boost_type_index
+	url = https://github.com/boostorg/type_index
+[submodule "third_party/boost_integer"]
+	path = third_party/boost_integer
+	url = https://github.com/boostorg/integer
+[submodule "third_party/boost_detail"]
+	path = third_party/boost_detail
+	url = https://github.com/boostorg/detail

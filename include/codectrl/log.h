@@ -2,10 +2,13 @@
 #include <algorithm>
 #include <asio.hpp>
 #include <boost/stacktrace.hpp>
+#include <boost/type_index.hpp>
 #include <cstdint>
 #include <deque>
 #include <fstream>
 #include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 #include <map>
 #include <optional>
 #include <sstream>
@@ -13,16 +16,80 @@
 
 #include "backtrace_data.h"
 
+using namespace jsoncons;
+
 namespace CodeCtrl {
+inline std::string trim(std::string& str) {
+    size_t first = str.find_first_not_of(' ');
+    size_t last = str.find_last_not_of(' ');
+    return str.substr(first, (last - first + 1));
+}
+
+class LogData {
+    std::deque<data::BacktraceData> stack_;
+    uint32_t line_number_;
+    std::map<uint32_t, std::string> code_snippet_;
+    std::string message_;
+    std::string message_type_;
+    std::string file_name_;
+    std::string address_;
+    std::vector<std::string> warnings_;
+
+   public:  // class methods
+    LogData(const std::deque<data::BacktraceData>& stack,
+            uint32_t line_number,
+            const std::map<uint32_t, std::string>& code_snippet,
+            const std::string& message,
+            const std::string& message_type,
+            const std::string& file_name,
+            const std::string& address,
+            const std::vector<std::string>& warnings)
+        : stack_(stack),
+          line_number_(line_number),
+          code_snippet_(code_snippet),
+          message_(message),
+          message_type_(message_type),
+          file_name_(file_name),
+          address_(address),
+          warnings_(warnings){};
+
+   public:  // setters for (de)serialisation
+    const std::deque<data::BacktraceData>& stack() const { return stack_; }
+    uint32_t line_number() const { return line_number_; }
+    const std::map<uint32_t, std::string>& code_snippet() const {
+        return code_snippet_;
+    }
+    const std::string& message() const { return message_; }
+    const std::string& message_type() const { return message_type_; }
+    const std::string& file_name() const { return file_name_; }
+    const std::string& address() const { return address_; }
+    const std::vector<std::string>& warnings() const { return warnings_; }
+
+   public:  // operator overloads
+    friend bool operator==(const LogData& lhs, const LogData& rhs) {
+        return (lhs.stack_ == rhs.stack_ &&
+                lhs.line_number_ == rhs.line_number_ &&
+                lhs.code_snippet_ == rhs.code_snippet_ &&
+                lhs.message_ == rhs.message_ &&
+                lhs.message_type_ == rhs.message_type_ &&
+                lhs.file_name_ == rhs.file_name_ &&
+                lhs.address_ == rhs.address_ && lhs.warnings_ == rhs.warnings_);
+    }
+
+    friend bool operator!=(const LogData& lhs, const LogData& rhs) {
+        return !(lhs == rhs);
+    }
+};
 
 template <typename T>
+
 class Log {
    public:
     std::deque<data::BacktraceData> stack = {};
     uint32_t line_number = 0;
     std::map<uint32_t, std::string> code_snippet = {};
     std::string message = "";
-    std::string message_type = typeid(T).name();
+    std::string message_type = boost::typeindex::type_id<T>().pretty_name();
     std::string file_name = "";
     std::string address = "";
     std::vector<std::string> warnings = {};
@@ -34,7 +101,7 @@ class Log {
     std::string previous_function = "";
     uint32_t previous_line_number = 0;
 
-   public:
+   public:  // main class methods
     Log(int surround, std::string host, uint32_t port)
         : host(host), port(port), surround(surround) {}
 
@@ -95,7 +162,7 @@ class Log {
                 previous_function = function_name;
                 previous_line_number = current_line + 1;
 
-                code = line;
+                code = trim(line);
                 break;
             }
 
@@ -107,7 +174,7 @@ class Log {
                 previous_line_number = current_line + 1;
                 line_number = current_line + 1;
 
-                code = line;
+                code = trim(line);
                 break;
             }
         }
@@ -119,21 +186,39 @@ class Log {
         std::string file_path,
         uint32_t line_number,
         uint32_t surround) {
-        return {};
+        std::ifstream file(file_path);
+
+        std::map<uint32_t, std::string> code_snippet = {};
+        uint32_t offset_min = line_number - surround;
+        uint32_t offset_max = line_number + surround;
+        uint32_t current_line_number = 0;
+
+        for (std::string line; std::getline(file, line);
+             current_line_number++) {
+            if (current_line_number + 1 < offset_min ||
+                current_line_number + 1 > offset_max) {
+                continue;
+            }
+
+            code_snippet[current_line_number + 1] = line;
+        }
+
+        return code_snippet;
+    }
+
+    LogData into_log_data() {
+        LogData data(stack, line_number, code_snippet, message, message_type,
+                     file_name, address, warnings);
+        return data;
     }
 };
 
 template <typename T>
 std::optional<asio::error_code> log(T message,
-                                    int surround = 2,
+                                    int surround = 3,
                                     std::string host = "126.0.0.1",
                                     uint32_t port = 3001) {
     Log<T> log(surround, host, port);
-
-    asio::error_code error_code;
-    asio::io_context context;
-    asio::ip::tcp::endpoint endpoint(asio::ip::make_address(host, error_code),
-                                     port);
 
 #ifndef DEBUG
     std::cerr
@@ -153,7 +238,41 @@ std::optional<asio::error_code> log(T message,
 
     log.get_stack_trace();
 
+    data::BacktraceData last = log.stack.back();
+
+    log.code_snippet =
+        Log<T>::get_code_snippet(last.file_path_, last.line_number_, surround);
+    log.line_number = last.line_number_;
+    log.file_name = last.file_path_;
+
+    asio::error_code error_code;
+    asio::io_context context;
+    asio::ip::tcp::endpoint endpoint(asio::ip::make_address(host, error_code),
+                                     port);
+
+    std::string data;
+    encode_json_pretty(log.into_log_data(), data);
+
+    std::cout << data << std::endl;
+
     return {};
 }
 
 }  // namespace CodeCtrl
+
+JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::LogData,
+                                stack,
+                                code_snippet,
+                                message,
+                                message_type,
+                                line_number,
+                                file_name,
+                                address,
+                                warnings)
+
+JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::data::BacktraceData,
+                                name,
+                                file_path,
+                                line_number,
+                                column_number,
+                                code)

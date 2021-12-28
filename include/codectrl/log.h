@@ -76,6 +76,12 @@ class Log {
         std::ifstream file(file_path);
         uint32_t current_line = 0;
 
+        // NOTE: we have to manually do this because *for whatever reason*, both
+        // the ways that gcc on linux do stacktraces do not properly find the
+        // proper line numbers, they find the return line instead.
+        //
+        // TODO: testing on windows to whether or not it has the same issue as
+        // gcc on linux
         for (std::string line; std::getline(file, line); current_line++) {
             // if we're still above the previously found match, we continue
             if (current_line < previous_line_number)

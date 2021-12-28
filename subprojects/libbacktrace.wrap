@@ -1,0 +1,5 @@
+[wrap-git]
+directory = libbacktrace.git
+url = https://github.com/ianlancetaylor/libbacktrace
+revision = head
+patch_filename = add_meson_build.zip

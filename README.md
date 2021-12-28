@@ -23,5 +23,6 @@ changed.
 
 For *nix systems (i.e. Linux, BSD, macOS) and MinGW:
 
-- Requires `BOOST_STACKTRACE_USE_ADDR2LINE` to be enabled.
-- Requires `libdl` to be linked.
+- Requires `BOOST_STACKTRACE_USE_BACKTRACE` to be enabled.
+- Requires `libdl` and `libbacktrace` to be linked (see ``/tests` for more details on how
+  to do this in a meson context).

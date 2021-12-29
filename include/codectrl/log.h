@@ -131,6 +131,14 @@ class Log {
 
                     stack.push_front(data);
                 }
+
+#ifndef DEBUG
+                // if in release mode, push empty frame to stack anyway
+                data::BacktraceData data(frame.name(), frame.source_file(), 0,
+                                         0, "");
+
+                stack.push_front(data);
+#endif
             });
     }
 

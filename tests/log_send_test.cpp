@@ -20,9 +20,5 @@ void layer_one() {
 int main() {
     layer_one();
 
-#ifndef DEBUG
-    std::cout << "not in debug mode" << std::endl;
-#endif
-
     return 0;
 }

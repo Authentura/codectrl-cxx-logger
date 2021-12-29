@@ -21,14 +21,16 @@ libbacktrace_dep = dependency('libbacktrace', required: false)
 
 if get_option('buildtype') == 'debug' and build_machine.system() != 'windows'
     add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_BACKTRACE', language: 'cpp')
+elif get_option('buildtype') == 'debug'
+    add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_WINDBG', language: 'cpp')
+endif
 
+if build_machine.system() != 'windows'
     if not libbacktrace_dep.found() 
         libbacktrace_proj = subproject('libbacktrace')
         libbacktrace_dep = libbacktrace_proj.get_variable('libbacktrace_dep')
         include += libbacktrace_proj.get_variable('libbacktrace_includes')
     endif
-elif get_option('buildtype') == 'debug'
-    add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_WINDBG', language: 'cpp')
 endif
 
 subdir('include')

@@ -7,7 +7,6 @@
 #include <deque>
 #include <fstream>
 #include <iostream>
-#include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <map>
 #include <optional>
@@ -145,7 +144,7 @@ class Log {
 
         // NOTE: we have to manually do this because *for whatever reason*, both
         // the ways that gcc on linux do stacktraces do not properly find the
-        // proper line numbers, they find the return line instead.
+        // proper line numbers, they find the return address instead.
         //
         // TODO: testing on windows to whether or not it has the same issue as
         // gcc on linux
@@ -216,7 +215,7 @@ class Log {
 template <typename T>
 std::optional<asio::error_code> log(T message,
                                     int surround = 3,
-                                    std::string host = "126.0.0.1",
+                                    std::string host = "127.0.0.1",
                                     uint32_t port = 3001) {
     Log<T> log(surround, host, port);
 
@@ -226,7 +225,7 @@ std::optional<asio::error_code> log(T message,
            "will produce limited information. The stack trace, file path and "
            "line number will be missing from the final message that is sent to "
            "the server. Please consider guarding this function using #ifdef "
-           "DEBUG symbols so that this message does not re-appear.";
+           "DEBUG so that this message does not re-appear.";
 
     log.warnings.push_back(
         "File was compiled without debug info, meaning information was lost");
@@ -245,17 +244,27 @@ std::optional<asio::error_code> log(T message,
     log.line_number = last.line_number_;
     log.file_name = last.file_path_;
 
-    asio::error_code error_code;
+    std::string data;
+    cbor::encode_cbor(log.into_log_data(), data);
+
+    asio::error_code error_code = {};
     asio::io_context context;
     asio::ip::tcp::endpoint endpoint(asio::ip::make_address(host, error_code),
                                      port);
 
-    std::string data;
-    encode_json_pretty(log.into_log_data(), data);
+    asio::ip::tcp::resolver resolver(context);
+    asio::ip::tcp::resolver::results_type endpoints =
+        resolver.resolve(endpoint, error_code);
 
-    std::cout << data << std::endl;
+    asio::ip::tcp::socket socket(context);
+    asio::connect(socket, endpoints);
 
-    return {};
+    socket.write_some(asio::buffer(data), error_code);
+
+    if (error_code)
+        return error_code;
+    else
+        return {};
 }
 
 }  // namespace CodeCtrl

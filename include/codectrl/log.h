@@ -110,6 +110,7 @@ class Log {
         std::for_each(
             stacktrace.begin() + 1, stacktrace.end(),
             [this](boost::stacktrace::frame frame) {
+#ifdef DEBUG
                 // this is some potentially confusing syntax so i will clarify:
                 // std::string::find returns the index of the first character
                 // where the substring is found. we compare whether the fact the
@@ -131,13 +132,6 @@ class Log {
 
                     stack.push_front(data);
                 }
-
-#ifndef DEBUG
-                // if in release mode, push empty frame to stack anyway
-                data::BacktraceData data(frame.name(), frame.source_file(), 0,
-                                         0, "");
-
-                stack.push_front(data);
 #endif
             });
     }
@@ -245,12 +239,14 @@ std::optional<asio::error_code> log(T message,
 
     log.get_stack_trace();
 
-    data::BacktraceData last = log.stack.back();
+    if (log.stack != std::deque<data::BacktraceData>()) {
+        data::BacktraceData last = log.stack.back();
 
-    log.code_snippet =
-        Log<T>::get_code_snippet(last.file_path_, last.line_number_, surround);
-    log.line_number = last.line_number_;
-    log.file_name = last.file_path_;
+        log.code_snippet = Log<T>::get_code_snippet(
+            last.file_path_, last.line_number_, surround);
+        log.line_number = last.line_number_;
+        log.file_name = last.file_path_;
+    }
 
     std::string data;
     cbor::encode_cbor(log.into_log_data(), data);

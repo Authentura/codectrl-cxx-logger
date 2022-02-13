@@ -19,7 +19,7 @@ include = [include_directories(
 )]
 
 libbacktrace_dep = dependency('libbacktrace', required: false)
-thread_dep = dependency('threads', required: false)
+thread_dep = dependency('threads', required: true)
 
 if get_option('buildtype') == 'debug' and build_machine.system() != 'windows'
     add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_BACKTRACE', language: 'cpp')

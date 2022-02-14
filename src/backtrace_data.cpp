@@ -1,0 +1,31 @@
+#include "backtrace_data.h"
+
+namespace CodeCtrl::data {
+    BacktraceData::BacktraceData(const std::string& name,
+                  const std::string& file_path,
+                  uint32_t line_number,
+                  uint32_t column_number,
+                  const std::string& code)
+        : name_(name),
+          file_path_(file_path),
+          line_number_(line_number),
+          column_number_(column_number),
+          code_(code) {}
+
+    const std::string& BacktraceData::name() const { return name_; }
+    const std::string& BacktraceData::file_path() const { return file_path_; }
+    uint32_t BacktraceData::line_number() const { return line_number_; }
+    uint32_t BacktraceData::column_number() const { return column_number_; }
+    const std::string& BacktraceData::code() const { return code_; }
+
+    friend bool BacktraceData::operator==(const BacktraceData& lhs, const BacktraceData& rhs) {
+        return (lhs.name_ == rhs.name_ && lhs.file_path_ == rhs.file_path_ &&
+                lhs.line_number_ == rhs.line_number_ &&
+                lhs.column_number_ == rhs.column_number_ &&
+                lhs.code_ == rhs.code_);
+    }
+
+    friend bool BacktraceData::operator!=(const BacktraceData& lhs, const BacktraceData& rhs) {
+        return !(lhs == rhs);
+    }
+}  // namespace CodeCtrl::data

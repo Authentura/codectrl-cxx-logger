@@ -35,4 +35,5 @@ if build_machine.system() != 'windows'
 endif
 
 subdir('include')
+subdir('src')
 subdir('tests')

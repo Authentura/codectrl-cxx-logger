@@ -1,9 +1,11 @@
 test_dependencies = []
 link_args = []
+cpp_args = []
 
 if build_machine.system() != 'windows'
   test_dependencies = [libbacktrace_dep, thread_dep]
   link_args = ['-ldl']
+  cpp_args = ['-w']
 else
   link_args = ['-lole32', '-ldbgeng']
 endif
@@ -14,7 +16,8 @@ log_send_test = executable(
     include_directories: include,
     dependencies: test_dependencies,
     link_args: link_args,
-    install: false
+    cpp_args: cpp_args,
+    install: false,
 )
 
 test('log_send_test', log_send_test)

@@ -5,7 +5,6 @@ project('codectrl-cxx-logger', 'cpp',
     default_options: [
         'cpp_std=c++17', 
         'default_library=both',
-        'warning_level=2'
     ]
 )
 

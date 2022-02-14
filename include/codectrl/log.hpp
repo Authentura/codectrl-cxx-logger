@@ -1,4 +1,5 @@
 #pragma once
+
 #include <algorithm>
 #include <asio.hpp>
 #include <boost/stacktrace.hpp>
@@ -14,6 +15,7 @@
 #include <vector>
 
 #include "backtrace_data.h"
+#include "codectrl/can_to_string.h"
 
 using namespace jsoncons;
 
@@ -81,7 +83,6 @@ class LogData {
 };
 
 template <typename T>
-
 class Log {
    public:
     std::deque<data::BacktraceData> stack = {};
@@ -233,9 +234,13 @@ std::optional<asio::error_code> log(T message,
         "File was compiled without debug info, meaning information was lost");
 #endif
 
-    std::ostringstream stream;
-    stream << message;
-    log.message = stream.str();
+    if constexpr (can_to_string_v<T>) {
+        log.message = std::to_string(message);
+    } else if (std::is_same_v<T, const char*>) {
+        log.message = message;
+    } else {
+        return {};
+    }
 
     log.get_stack_trace();
 

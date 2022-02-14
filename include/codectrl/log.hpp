@@ -243,9 +243,9 @@ std::optional<asio::error_code> log(T message,
         data::BacktraceData last = log.stack.back();
 
         log.code_snippet = Log<T>::get_code_snippet(
-            last.file_path_, last.line_number_, surround);
-        log.line_number = last.line_number_;
-        log.file_name = last.file_path_;
+            last.file_path(), last.line_number(), surround);
+        log.line_number = last.line_number();
+        log.file_name = last.file_path();
     }
 
     std::string data;

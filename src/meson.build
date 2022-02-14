@@ -1,3 +1,6 @@
-codectrl_logger = library(meson.project_name(), ['backtrace_data.cpp'],
+codectrl_logger = library(
+  'codectrl',
+  ['backtrace_data.cpp'],
   include_directories: include,
-  install : true)
+  install: true
+)

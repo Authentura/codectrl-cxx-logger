@@ -4,7 +4,8 @@ project('codectrl-cxx-logger', 'cpp',
     meson_version: '>= 0.55.0',
     default_options: [
         'cpp_std=c++17', 
-        'default_library=both'
+        'default_library=both',
+        'warning_level=2'
     ]
 )
 
@@ -14,11 +15,11 @@ description = 'The codeCTRL logger library for C++'
 subdir('third_party')
 
 include = [include_directories(
-    third_party_includes + ['./include',]
+    third_party_includes + ['include']
 )]
 
 libbacktrace_dep = dependency('libbacktrace', required: false)
-thread_dep = dependency('threads', required: true)
+thread_dep = dependency('threads', required: false)
 
 if get_option('buildtype') == 'debug' and build_machine.system() != 'windows'
     add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_BACKTRACE', language: 'cpp')

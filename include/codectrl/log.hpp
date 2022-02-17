@@ -13,6 +13,7 @@
 #include <optional>
 #include <sstream>
 #include <vector>
+#include <filesystem>
 
 #include "backtrace_data.h"
 #include "codectrl/can_to_string.h"
@@ -128,7 +129,10 @@ class Log {
                     std::string code = get_code(
                         frame.name(), frame.source_file(), line_number);
 
-                    data::BacktraceData data(frame.name(), frame.source_file(),
+                    auto file_path = std::filesystem::path(frame.source_file());
+                    file_path = std::filesystem::canonical(file_path);
+
+                    data::BacktraceData data(frame.name(), file_path.string(),
                                              line_number, 0, code);
 
                     stack.push_front(data);

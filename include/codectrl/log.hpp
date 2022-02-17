@@ -120,9 +120,7 @@ class Log {
                 // equal to npos is not found within the given std::string.
                 // therefore if we want the string *not* to be found we wanna
                 // make sure that std::string::find returns the value of npos.
-                if ((frame.name().find("CodeCtrl::log") == std::string::npos ||
-                     frame.name().find("CodeCtrl::log_if") ==
-                         std::string::npos) &&
+                if (frame.name().find("CodeCtrl::log") == std::string::npos &&
                     frame.name().find("libc") == std::string::npos &&
                     frame.name() != "_start" && !frame.name().empty()) {
                     uint32_t line_number = frame.source_line();

@@ -1,0 +1,6 @@
+
+[wrap-git]
+directory = boost_integer.git
+url = https://github.com/boostorg/integer 
+revision = head
+patch_directory = patches/boost/integer

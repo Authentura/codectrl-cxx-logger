@@ -1,0 +1,5 @@
+[wrap-git]
+directory = jsoncons.git
+url = https://github.com/danielaparker/jsoncons
+revision = head
+patch_directory = patches/jsoncons.git

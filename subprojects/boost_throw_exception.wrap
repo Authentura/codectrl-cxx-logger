@@ -1,0 +1,5 @@
+[wrap-git]
+directory = boost_throw_exception.git
+url = https://github.com/boostorg/throw_exception
+revision = head
+patch_directory = patches/boost/throw_exception

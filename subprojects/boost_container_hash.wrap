@@ -1,0 +1,6 @@
+
+[wrap-git]
+directory = boost_container_hash.git
+url = https://github.com/boostorg/container_hash 
+revision = head
+patch_directory = patches/boost/container_hash

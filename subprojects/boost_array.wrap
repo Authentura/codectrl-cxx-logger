@@ -1,0 +1,6 @@
+
+[wrap-git]
+directory = boost_array.git
+url = https://github.com/boostorg/array 
+revision = head
+patch_directory = patches/boost/array

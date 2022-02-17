@@ -11,14 +11,44 @@ project('codectrl-cxx-logger', 'cpp',
 emails = ['<contact@pwnctrl.com>', '<s.boyden@pwnctrl.com>']
 description = 'The codeCTRL logger library for C++'
 
-subdir('third_party')
-
-include = [include_directories(
-    third_party_includes + ['include']
-)]
+include = [include_directories('include')]
 
 libbacktrace_dep = dependency('libbacktrace', required: false)
-thread_dep = dependency('threads', required: false)
+thread_dep       = dependency('threads', required: false)
+
+asio_proj                  = subproject('asio')
+boost_array_proj           = subproject('boost_array')
+boost_assert_proj          = subproject('boost_assert')
+boost_config_proj          = subproject('boost_config')
+boost_container_hash_proj  = subproject('boost_container_hash')
+boost_core_proj            = subproject('boost_core')
+boost_detail_proj          = subproject('boost_detail')
+boost_integer_proj         = subproject('boost_integer')
+boost_predef_proj          = subproject('boost_predef')
+boost_stacktrace_proj      = subproject('boost_stacktrace')
+boost_static_assert_proj   = subproject('boost_static_assert')
+boost_throw_exception_proj = subproject('boost_throw_exception')
+boost_type_index_proj      = subproject('boost_type_index')
+boost_type_traits_proj     = subproject('boost_type_traits')
+jsoncons_proj              = subproject('jsoncons')
+
+include += [
+    asio_proj.get_variable('asio_includes'), 
+    boost_array_proj.get_variable('boost_array_includes'),
+    boost_assert_proj.get_variable('boost_assert_includes'),
+    boost_config_proj.get_variable('boost_config_includes'),
+    boost_container_hash_proj.get_variable('boost_container_hash_includes'),
+    boost_core_proj.get_variable('boost_core_includes'),
+    boost_detail_proj.get_variable('boost_detail_includes'),
+    boost_integer_proj.get_variable('boost_integer_includes'),
+    boost_predef_proj.get_variable('boost_predef_includes'),
+    boost_stacktrace_proj.get_variable('boost_stacktrace_includes'),
+    boost_static_assert_proj.get_variable('boost_static_assert_includes'),
+    boost_throw_exception_proj.get_variable('boost_throw_exception_includes'),
+    boost_type_index_proj.get_variable('boost_type_index_includes'),
+    boost_type_traits_proj.get_variable('boost_type_traits_includes'),
+    jsoncons_proj.get_variable('jsoncons_includes')
+]
 
 if get_option('buildtype') == 'debug' and build_machine.system() != 'windows'
     add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_BACKTRACE', language: 'cpp')

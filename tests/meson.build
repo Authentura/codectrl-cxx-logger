@@ -20,4 +20,15 @@ log_send_test = executable(
     install: false,
 )
 
+log_if_send_test = executable(
+    'log_if_send_test',
+    'log_if_send_test.cpp',
+    include_directories: include,
+    dependencies: test_dependencies,
+    link_args: link_args,
+    cpp_args: cpp_args,
+    install: false,
+)
+
 test('log_send_test', log_send_test)
+test('log_if_send_test', log_if_send_test)

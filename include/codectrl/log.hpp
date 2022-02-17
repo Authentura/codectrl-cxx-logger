@@ -120,7 +120,9 @@ class Log {
                 // equal to npos is not found within the given std::string.
                 // therefore if we want the string *not* to be found we wanna
                 // make sure that std::string::find returns the value of npos.
-                if (frame.name().find("CodeCtrl::log") == std::string::npos &&
+                if ((frame.name().find("CodeCtrl::log") == std::string::npos ||
+                     frame.name().find("CodeCtrl::log_if") ==
+                         std::string::npos) &&
                     frame.name().find("libc") == std::string::npos &&
                     frame.name() != "_start" && !frame.name().empty()) {
                     uint32_t line_number = frame.source_line();
@@ -160,7 +162,8 @@ class Log {
             // equal to the log function call then we can tell the current line
             // number is correct
             if (previous_function.empty() &&
-                line.find("CodeCtrl::log") != std::string::npos) {
+                (line.find("CodeCtrl::log") != std::string::npos ||
+                 line.find("CodeCtrl::log_if") != std::string::npos)) {
                 previous_function = function_name;
                 previous_line_number = current_line + 1;
 
@@ -276,6 +279,16 @@ std::optional<asio::error_code> log(T message,
         return {};
 }
 
+template <typename T>
+std::optional<asio::error_code> log_if(bool (*const condition)(),
+                                       T message,
+                                       int surround = 3,
+                                       std::string host = "127.0.0.1",
+                                       uint32_t port = 3001) {
+    if (condition()) {
+        return log(message, surround, host, port);
+    }
+}
 }  // namespace CodeCtrl
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::LogData,

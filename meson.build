@@ -11,7 +11,7 @@ project('codectrl-cxx-logger', 'cpp',
 emails = ['<contact@pwnctrl.com>', '<s.boyden@pwnctrl.com>']
 description = 'The codeCTRL logger library for C++'
 
-include = [include_directories('include')]
+codectrl_logger_includes = [include_directories('include')]
 
 libbacktrace_dep = dependency('libbacktrace', required: false)
 thread_dep       = dependency('threads', required: false)
@@ -32,7 +32,7 @@ boost_type_index_proj      = subproject('boost_type_index')
 boost_type_traits_proj     = subproject('boost_type_traits')
 jsoncons_proj              = subproject('jsoncons')
 
-include += [
+codectrl_logger_includes += [
     asio_proj.get_variable('asio_includes'), 
     boost_array_proj.get_variable('boost_array_includes'),
     boost_assert_proj.get_variable('boost_assert_includes'),
@@ -56,13 +56,21 @@ elif get_option('buildtype') == 'debug'
     add_project_arguments('-DDEBUG', '-DBOOST_STACKTRACE_USE_WINDBG', language: 'cpp')
 endif
 
+dependencies = []
+
 if build_machine.system() != 'windows'
     if not libbacktrace_dep.found() 
         libbacktrace_proj = subproject('libbacktrace')
         libbacktrace_dep = libbacktrace_proj.get_variable('libbacktrace_dep')
-        include += libbacktrace_proj.get_variable('libbacktrace_includes')
+        codectrl_logger_includes += libbacktrace_proj.get_variable('libbacktrace_includes')
     endif
+
+    dependencies = [libbacktrace_dep, thread_dep]
 endif
+
+include = codectrl_logger_includes
 
 subdir('include')
 subdir('tests')
+
+codectrl_dep = declare_dependency(dependencies: dependencies)

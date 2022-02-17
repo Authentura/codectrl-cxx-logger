@@ -1,4 +1,3 @@
-
 [wrap-git]
 directory = boost_array.git
 url = https://github.com/boostorg/array 

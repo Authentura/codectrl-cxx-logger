@@ -5,7 +5,9 @@
 #include <boost/stacktrace.hpp>
 #include <boost/type_index.hpp>
 #include <cstdint>
+#include <cstdlib>
 #include <deque>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -13,7 +15,6 @@
 #include <optional>
 #include <sstream>
 #include <vector>
-#include <filesystem>
 
 #include "backtrace_data.h"
 #include "codectrl/can_to_string.h"
@@ -290,6 +291,26 @@ std::optional<asio::error_code> log_if(bool (*const condition)(),
     if (condition()) {
         return log(message, surround, host, port);
     }
+
+    return {};
+}
+
+template <typename T>
+std::optional<asio::error_code> log_when_env(T message,
+                                             int surround = 3,
+                                             std::string host = "127.0.0.1",
+                                             uint32_t port = 3001) {
+    if (std::getenv("CODECTRL_DEBUG")) {
+        return log(message, surround, host, port);
+    }
+#ifdef DEBUG
+    else {
+        std::cerr << "log not called: CODECTRL_DEBUG environment variable is "
+                     "not present\n";
+    }
+#endif
+
+    return {};
 }
 }  // namespace CodeCtrl
 

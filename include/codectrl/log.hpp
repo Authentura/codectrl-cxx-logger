@@ -242,9 +242,12 @@ std::optional<asio::error_code> log(T message,
 
     if constexpr (can_to_string_v<T>) {
         log.message = std::to_string(message);
-    } else if (std::is_same_v<T, const char*>) {
+    } else if constexpr(has_to_string_v<T>) {
+        log.message = message.to_string();
+    } else if constexpr(std::is_same_v<T, const char*>) {
         log.message = message;
-    } else {
+    }
+    else {
         return {};
     }
 

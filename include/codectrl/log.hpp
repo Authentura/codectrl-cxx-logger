@@ -35,6 +35,7 @@ class LogData {
     std::string message_;
     std::string message_type_;
     std::string file_name_;
+    std::string language_;
     std::string address_;
     std::vector<std::string> warnings_;
 
@@ -45,6 +46,7 @@ class LogData {
             const std::string& message,
             const std::string& message_type,
             const std::string& file_name,
+            const std::string& language,
             const std::string& address,
             const std::vector<std::string>& warnings)
         : stack_(stack),
@@ -53,6 +55,7 @@ class LogData {
           message_(message),
           message_type_(message_type),
           file_name_(file_name),
+          language_(language),
           address_(address),
           warnings_(warnings){};
 
@@ -65,6 +68,7 @@ class LogData {
     const std::string& message() const { return message_; }
     const std::string& message_type() const { return message_type_; }
     const std::string& file_name() const { return file_name_; }
+    const std::string& language() const { return language_; }
     const std::string& address() const { return address_; }
     const std::vector<std::string>& warnings() const { return warnings_; }
 
@@ -76,7 +80,9 @@ class LogData {
                 lhs.message_ == rhs.message_ &&
                 lhs.message_type_ == rhs.message_type_ &&
                 lhs.file_name_ == rhs.file_name_ &&
-                lhs.address_ == rhs.address_ && lhs.warnings_ == rhs.warnings_);
+                lhs.language_ == rhs.language_ &&
+                lhs.address_ == rhs.address_ &&
+                lhs.warnings_ == rhs.warnings_);
     }
 
     friend bool operator!=(const LogData& lhs, const LogData& rhs) {
@@ -93,6 +99,7 @@ class Log {
     std::string message = "";
     std::string message_type = boost::typeindex::type_id<T>().pretty_name();
     std::string file_name = "";
+    std::string language = "c++";
     std::string address = "";
     std::vector<std::string> warnings = {};
 
@@ -216,7 +223,7 @@ class Log {
 
     LogData into_log_data() {
         LogData data(stack, line_number, code_snippet, message, message_type,
-                     file_name, address, warnings);
+                     file_name, language, address, warnings);
         return data;
     }
 };
@@ -246,8 +253,7 @@ std::optional<asio::error_code> log(T message,
         log.message = message.to_string();
     } else if constexpr(std::is_same_v<T, const char*>) {
         log.message = message;
-    }
-    else {
+    } else {
         return {};
     }
 

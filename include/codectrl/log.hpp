@@ -331,7 +331,8 @@ JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::LogData,
                                 line_number,
                                 file_name,
                                 address,
-                                warnings)
+                                warnings,
+                                language)
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::data::BacktraceData,
                                 name,

@@ -99,7 +99,7 @@ class Log {
     std::string message = "";
     std::string message_type = boost::typeindex::type_id<T>().pretty_name();
     std::string file_name = "";
-    std::string language = "c++";
+    std::string language = "C++";
     std::string address = "";
     std::vector<std::string> warnings = {};
 

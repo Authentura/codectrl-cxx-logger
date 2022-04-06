@@ -149,9 +149,11 @@ class Log {
             });
     }
 
-    std::string get_code(std::string function_name,
-                         std::string file_path,
-                         uint32_t& line_number) {
+    std::string get_code(
+        std::string function_name,
+        std::string file_path,
+        uint32_t& line_number
+  ) {
         std::string code = "";
 
         std::ifstream file(file_path);
@@ -229,10 +231,12 @@ class Log {
 };
 
 template <typename T>
-std::optional<asio::error_code> log(T message,
-                                    int surround = 3,
-                                    std::string host = "127.0.0.1",
-                                    uint32_t port = 3001) {
+std::optional<asio::error_code> log(
+    T message,
+    int surround = 3,
+    std::string host = "127.0.0.1",
+    uint32_t port = 3001
+) {
     Log<T> log(surround, host, port);
 
 #ifndef DEBUG
@@ -292,11 +296,13 @@ std::optional<asio::error_code> log(T message,
 }
 
 template <typename T>
-std::optional<asio::error_code> log_if(bool (*const condition)(),
-                                       T message,
-                                       int surround = 3,
-                                       std::string host = "127.0.0.1",
-                                       uint32_t port = 3001) {
+    std::optional<asio::error_code> log_if(
+    bool (*const condition)(),
+    T message,
+    int surround = 3,
+    std::string host = "127.0.0.1",
+    uint32_t port = 3001
+) {
     if (condition()) {
         return log(message, surround, host, port);
     }
@@ -305,10 +311,12 @@ std::optional<asio::error_code> log_if(bool (*const condition)(),
 }
 
 template <typename T>
-std::optional<asio::error_code> log_when_env(T message,
-                                             int surround = 3,
-                                             std::string host = "127.0.0.1",
-                                             uint32_t port = 3001) {
+std::optional<asio::error_code> log_if_env(
+    T message,
+    int surround = 3,
+    std::string host = "127.0.0.1",
+    uint32_t port = 3001
+) {
     if (std::getenv("CODECTRL_DEBUG")) {
         return log(message, surround, host, port);
     }
@@ -323,20 +331,24 @@ std::optional<asio::error_code> log_when_env(T message,
 }
 }  // namespace CodeCtrl
 
-JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::LogData,
-                                stack,
-                                code_snippet,
-                                message,
-                                message_type,
-                                line_number,
-                                file_name,
-                                address,
-                                warnings,
-                                language)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(
+    CodeCtrl::LogData,
+    stack,
+    code_snippet,
+    message,
+    message_type,
+    line_number,
+    file_name,
+    address,
+    warnings,
+    language
+)
 
-JSONCONS_ALL_CTOR_GETTER_TRAITS(CodeCtrl::data::BacktraceData,
-                                name,
-                                file_path,
-                                line_number,
-                                column_number,
-                                code)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(
+    CodeCtrl::data::BacktraceData,
+    name,
+    file_path,
+    line_number,
+    column_number,
+    code
+)

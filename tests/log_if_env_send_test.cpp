@@ -3,7 +3,7 @@
 #include "codectrl/log.hpp"
 
 void layer_four() {
-    CodeCtrl::log_when_env("Hello, world env");
+    CodeCtrl::log_if_env("Hello, world env");
 }
 
 void layer_three() {

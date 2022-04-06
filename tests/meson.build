@@ -30,9 +30,9 @@ log_if_send_test = executable(
     install: false,
 )
 
-log_when_env_test = executable(
-    'log_when_env_test',
-    'log_when_env_send_test.cpp',
+log_if_env_test = executable(
+    'log_if_env_test',
+    'log_if_env_send_test.cpp',
     include_directories: include,
     dependencies: test_dependencies,
     link_args: link_args,
@@ -42,4 +42,4 @@ log_when_env_test = executable(
 
 test('log_send_test', log_send_test)
 test('log_if_send_test', log_if_send_test)
-test('log_when_env_test', log_when_env_test)
+test('log_if_env_test', log_if_env_test)

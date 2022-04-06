@@ -13,16 +13,17 @@ class BacktraceData {
 
    public:
     // class methods
-    BacktraceData(const std::string& name,
-                  const std::string& file_path,
-                  uint32_t line_number,
-                  uint32_t column_number,
-                  const std::string& code)
-        : name_(name),
-          file_path_(file_path),
-          line_number_(line_number),
-          column_number_(column_number),
-          code_(code) {}
+    BacktraceData(
+        const std::string& name,
+        const std::string& file_path,
+        uint32_t line_number,
+        uint32_t column_number,
+        const std::string& code
+    ) : name_(name),
+        file_path_(file_path),
+        line_number_(line_number),
+        column_number_(column_number),
+        code_(code) {}
 
     // getter methods for (de)serialisation
     const std::string& name() const { return name_; }
@@ -33,10 +34,12 @@ class BacktraceData {
 
     // operator overloads
     friend bool operator==(const BacktraceData& lhs, const BacktraceData& rhs) {
-        return (lhs.name_ == rhs.name_ && lhs.file_path_ == rhs.file_path_ &&
-                lhs.line_number_ == rhs.line_number_ &&
-                lhs.column_number_ == rhs.column_number_ &&
-                lhs.code_ == rhs.code_);
+        return (
+            lhs.name_ == rhs.name_ && lhs.file_path_ == rhs.file_path_ &&
+            lhs.line_number_ == rhs.line_number_ &&
+            lhs.column_number_ == rhs.column_number_ &&
+            lhs.code_ == rhs.code_
+        );
     }
 
     friend bool operator!=(const BacktraceData& lhs, const BacktraceData& rhs) {

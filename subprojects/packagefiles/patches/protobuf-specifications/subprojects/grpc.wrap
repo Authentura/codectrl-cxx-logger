@@ -1,0 +1,4 @@
+[wrap-git]
+directory = grpc.git
+url = https://github.com/grpc/grpc
+revision = v1.47.1

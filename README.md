@@ -21,8 +21,10 @@ changed.
 
 ### Important information
 
-For *nix systems (i.e. Linux, BSD, macOS) and MinGW:
+For \*nix systems (i.e. Linux, BSD, macOS) and MinGW:
 
 - Requires `BOOST_STACKTRACE_USE_BACKTRACE` to be enabled.
 - Requires `libdl` and `libbacktrace` to be linked (see `/tests` for more details on how
   to do this in a meson context).
+- Depending on your Linux distribution, you will need to install both `protoc`
+  and the Protobuf header files. For example, on Fedora 36: `# dnf install protobuf protobuf-devel`, will get you the required files.

@@ -2,4 +2,4 @@
 directory = libbacktrace.git
 url = https://github.com/ianlancetaylor/libbacktrace
 revision = head
-patch_directory = patches/libbacktrace.git
+patch_directory = patches/libbacktrace

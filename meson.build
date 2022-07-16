@@ -1,5 +1,5 @@
 project('codectrl-cxx-logger', 'cpp', 
-    version: '0.2.0',
+    version: '0.3.0',
     license: 'MIT',
     meson_version: '>= 0.55.0',
     default_options: [
@@ -8,7 +8,7 @@ project('codectrl-cxx-logger', 'cpp',
     ]
 )
 
-emails = ['<contact@pwnctrl.com>', '<s.boyden@pwnctrl.com>']
+emails = ['<contact@authentura.com>', '<s.boyden@authentura.com>']
 description = 'The codeCTRL logger library for C++'
 
 codectrl_logger_includes = [include_directories('include')]
@@ -16,7 +16,6 @@ codectrl_logger_includes = [include_directories('include')]
 libbacktrace_dep = dependency('libbacktrace', required: false)
 thread_dep       = dependency('threads', required: false)
 
-asio_proj                  = subproject('asio')
 boost_array_proj           = subproject('boost_array')
 boost_assert_proj          = subproject('boost_assert')
 boost_config_proj          = subproject('boost_config')
@@ -30,10 +29,9 @@ boost_static_assert_proj   = subproject('boost_static_assert')
 boost_throw_exception_proj = subproject('boost_throw_exception')
 boost_type_index_proj      = subproject('boost_type_index')
 boost_type_traits_proj     = subproject('boost_type_traits')
-jsoncons_proj              = subproject('jsoncons')
+cps_proj                   = subproject('protobuf-specifications')
 
 codectrl_logger_includes += [
-    asio_proj.get_variable('asio_includes'), 
     boost_array_proj.get_variable('boost_array_includes'),
     boost_assert_proj.get_variable('boost_assert_includes'),
     boost_config_proj.get_variable('boost_config_includes'),
@@ -47,7 +45,7 @@ codectrl_logger_includes += [
     boost_throw_exception_proj.get_variable('boost_throw_exception_includes'),
     boost_type_index_proj.get_variable('boost_type_index_includes'),
     boost_type_traits_proj.get_variable('boost_type_traits_includes'),
-    jsoncons_proj.get_variable('jsoncons_includes')
+    cps_proj.get_variable('cps_includes')
 ]
 
 if get_option('buildtype') == 'debug' and build_machine.system() != 'windows'
@@ -65,7 +63,7 @@ if build_machine.system() != 'windows'
         codectrl_logger_includes += libbacktrace_proj.get_variable('libbacktrace_includes')
     endif
 
-    dependencies = [libbacktrace_dep, thread_dep]
+    dependencies = [libbacktrace_dep, thread_dep, ]
 endif
 
 include = codectrl_logger_includes

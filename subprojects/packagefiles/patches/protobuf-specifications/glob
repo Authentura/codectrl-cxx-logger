@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+import glob as g
+
+sources = g.glob('*.proto')
+
+for source in sources:
+    print(source)

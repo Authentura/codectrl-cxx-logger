@@ -1,0 +1,5 @@
+[wrap-git]
+directory = codectrl-protobuf-specifications.git
+url = https://github.com/Authentura/codectrl-protobuf-specifications
+patch_directory = patches/protobuf-specifications
+revision = v0.7.0

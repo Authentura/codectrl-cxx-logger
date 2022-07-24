@@ -1,4 +1,4 @@
-test_dependencies = []
+test_dependencies = [dependencies]
 link_args = []
 cpp_args = []
 

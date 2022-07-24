@@ -1,7 +1,7 @@
 #pragma once
 
+#include <grpcpp/grpcpp.h>
 #include <algorithm>
-#include <asio.hpp>
 #include <boost/stacktrace.hpp>
 #include <boost/type_index.hpp>
 #include <cstdint>
@@ -10,16 +10,15 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <jsoncons_ext/cbor/cbor.hpp>
 #include <map>
 #include <optional>
 #include <sstream>
 #include <vector>
 
-#include "backtrace_data.h"
-#include "codectrl/can_to_string.h"
+// #include ""
 
-using namespace jsoncons;
+#include "backtrace_data.h"
+#include "can_to_string.h"
 
 namespace CodeCtrl {
 inline std::string trim(std::string& str) {
@@ -27,68 +26,6 @@ inline std::string trim(std::string& str) {
     size_t last = str.find_last_not_of(' ');
     return str.substr(first, (last - first + 1));
 }
-
-class LogData {
-    std::deque<data::BacktraceData> stack_;
-    uint32_t line_number_;
-    std::map<uint32_t, std::string> code_snippet_;
-    std::string message_;
-    std::string message_type_;
-    std::string file_name_;
-    std::string language_;
-    std::string address_;
-    std::vector<std::string> warnings_;
-
-   public:  // class methods
-    LogData(const std::deque<data::BacktraceData>& stack,
-            uint32_t line_number,
-            const std::map<uint32_t, std::string>& code_snippet,
-            const std::string& message,
-            const std::string& message_type,
-            const std::string& file_name,
-            const std::string& language,
-            const std::string& address,
-            const std::vector<std::string>& warnings)
-        : stack_(stack),
-          line_number_(line_number),
-          code_snippet_(code_snippet),
-          message_(message),
-          message_type_(message_type),
-          file_name_(file_name),
-          language_(language),
-          address_(address),
-          warnings_(warnings){};
-
-   public:  // setters for (de)serialisation
-    const std::deque<data::BacktraceData>& stack() const { return stack_; }
-    uint32_t line_number() const { return line_number_; }
-    const std::map<uint32_t, std::string>& code_snippet() const {
-        return code_snippet_;
-    }
-    const std::string& message() const { return message_; }
-    const std::string& message_type() const { return message_type_; }
-    const std::string& file_name() const { return file_name_; }
-    const std::string& language() const { return language_; }
-    const std::string& address() const { return address_; }
-    const std::vector<std::string>& warnings() const { return warnings_; }
-
-   public:  // operator overloads
-    friend bool operator==(const LogData& lhs, const LogData& rhs) {
-        return (lhs.stack_ == rhs.stack_ &&
-                lhs.line_number_ == rhs.line_number_ &&
-                lhs.code_snippet_ == rhs.code_snippet_ &&
-                lhs.message_ == rhs.message_ &&
-                lhs.message_type_ == rhs.message_type_ &&
-                lhs.file_name_ == rhs.file_name_ &&
-                lhs.language_ == rhs.language_ &&
-                lhs.address_ == rhs.address_ &&
-                lhs.warnings_ == rhs.warnings_);
-    }
-
-    friend bool operator!=(const LogData& lhs, const LogData& rhs) {
-        return !(lhs == rhs);
-    }
-};
 
 template <typename T>
 class Log {
@@ -149,11 +86,9 @@ class Log {
             });
     }
 
-    std::string get_code(
-        std::string function_name,
-        std::string file_path,
-        uint32_t& line_number
-  ) {
+    std::string get_code(std::string function_name,
+                         std::string file_path,
+                         uint32_t& line_number) {
         std::string code = "";
 
         std::ifstream file(file_path);
@@ -222,21 +157,13 @@ class Log {
 
         return code_snippet;
     }
-
-    LogData into_log_data() {
-        LogData data(stack, line_number, code_snippet, message, message_type,
-                     file_name, language, address, warnings);
-        return data;
-    }
 };
 
 template <typename T>
-std::optional<asio::error_code> log(
-    T message,
-    int surround = 3,
-    std::string host = "127.0.0.1",
-    uint32_t port = 3001
-) {
+void log(T message,
+         int surround = 3,
+         std::string host = "127.0.0.1",
+         uint32_t port = 3001) {
     Log<T> log(surround, host, port);
 
 #ifndef DEBUG
@@ -251,14 +178,14 @@ std::optional<asio::error_code> log(
         "File was compiled without debug info, meaning information was lost");
 #endif
 
-    if constexpr (can_to_string_v<T>) {
+    if constexpr (can_to_string<T>) {
         log.message = std::to_string(message);
-    } else if constexpr(has_to_string_v<T>) {
+    } else if constexpr (has_to_string_v<T>) {
         log.message = message.to_string();
-    } else if constexpr(std::is_same_v<T, const char*>) {
+    } else if constexpr (std::is_same<T, const char*>) {
         log.message = message;
     } else {
-        return {};
+        return;
     }
 
     log.get_stack_trace();
@@ -266,57 +193,31 @@ std::optional<asio::error_code> log(
     if (log.stack != std::deque<data::BacktraceData>()) {
         data::BacktraceData last = log.stack.back();
 
-        log.code_snippet = Log<T>::get_code_snippet(
-            last.file_path(), last.line_number(), surround);
-        log.line_number = last.line_number();
-        log.file_name = last.file_path();
+        log.code_snippet = Log<T>::get_code_snippet(last.file_path,
+                                                    last.line_number, surround);
+        log.line_number = last.line_number;
+        log.file_name = last.file_path;
     }
-
-    std::string data;
-    cbor::encode_cbor(log.into_log_data(), data);
-
-    asio::error_code error_code = {};
-    asio::io_context context;
-    asio::ip::tcp::endpoint endpoint(asio::ip::make_address(host, error_code),
-                                     port);
-
-    asio::ip::tcp::resolver resolver(context);
-    asio::ip::tcp::resolver::results_type endpoints =
-        resolver.resolve(endpoint, error_code);
-
-    asio::ip::tcp::socket socket(context);
-    asio::connect(socket, endpoints);
-
-    socket.write_some(asio::buffer(data), error_code);
-
-    if (error_code)
-        return error_code;
-    else
-        return {};
 }
 
 template <typename T>
-    std::optional<asio::error_code> log_if(
-    bool (*const condition)(),
-    T message,
-    int surround = 3,
-    std::string host = "127.0.0.1",
-    uint32_t port = 3001
-) {
+void log_if(bool (*const condition)(),
+                                       T message,
+                                       int surround = 3,
+                                       std::string host = "127.0.0.1",
+                                       uint32_t port = 3001) {
     if (condition()) {
         return log(message, surround, host, port);
     }
 
-    return {};
+    return ;
 }
 
 template <typename T>
-std::optional<asio::error_code> log_if_env(
-    T message,
-    int surround = 3,
-    std::string host = "127.0.0.1",
-    uint32_t port = 3001
-) {
+void  log_if_env(T message,
+                                           int surround = 3,
+                                           std::string host = "127.0.0.1",
+                                           uint32_t port = 3001) {
     if (std::getenv("CODECTRL_DEBUG")) {
         return log(message, surround, host, port);
     }
@@ -327,28 +228,6 @@ std::optional<asio::error_code> log_if_env(
     }
 #endif
 
-    return {};
+    return ;
 }
 }  // namespace CodeCtrl
-
-JSONCONS_ALL_CTOR_GETTER_TRAITS(
-    CodeCtrl::LogData,
-    stack,
-    code_snippet,
-    message,
-    message_type,
-    line_number,
-    file_name,
-    address,
-    warnings,
-    language
-)
-
-JSONCONS_ALL_CTOR_GETTER_TRAITS(
-    CodeCtrl::data::BacktraceData,
-    name,
-    file_path,
-    line_number,
-    column_number,
-    code
-)

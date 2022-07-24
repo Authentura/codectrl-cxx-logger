@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package codectrl.data.backtrace_data;
+
+// Generalised message containing information regarding a single stacktrace
+// item.
+message BacktraceData {
+  string name         = 1;
+  string filePath     = 2;
+  uint32 lineNumber   = 3;
+  uint32 columnNumber = 4;
+  string code         = 5;
+}

@@ -19,3 +19,4 @@ test_view_output: test
 
 clean:
 	rm -rf $(OUT_DIR)
+	rm -rf subprojects/codectrl-protobuf-specifications.git

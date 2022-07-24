@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import glob as g
+import sys
+import subprocess
+import os
+
+sources = g.glob(f"{sys.argv[1]}/*.proto")
+
+for source in sources:
+    process = subprocess.Popen(["cp", "-f", source, os.path.basename(source)])
+    process.wait()
+    print(os.path.basename(source))

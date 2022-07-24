@@ -1,0 +1,79 @@
+
+syntax = "proto3";
+
+package codectrl.logs_service;
+
+import "log.proto";
+import "google/protobuf/empty.proto";
+
+
+// Status codes for whether or not a particular request has succeeded.
+enum RequestStatus {
+  CONFIRMED = 0;
+  ERROR = 1;
+}
+
+// Describes the connection between the interface and a given server. Each
+// client is supplied with a uuid that is saved to disk or to localStorage. The
+// server uses this information to determine which logs should be sent to each
+// client and to skip duplicate identified by the `uuid` of the log.
+message Connection {
+  string uuid = 1;
+}
+
+// Returned by the procedures to describe the result of a request.
+message RequestResult {
+  string        message = 1;
+  RequestStatus status  = 2;
+}
+
+
+// Server details about the current gRPC server.
+message ServerDetails {
+  string host   = 1;
+  uint32 port   = 2;
+  uint64 uptime = 3;
+}
+
+// LogServer is the service that should only be implemented by log servers
+// that can be connected to by a CodeCtrl front-end. Language loggers should
+// not implement this service or use it as a client for that matter. Ways of
+// enforcing that only servers can receive logs iS TBD but will be worked on
+// in the future.
+service LogServer {
+  // Gets the latest log from the server, generally not used but is here for
+  // compatibiliy's sake in the case where a front-end cannot use a stream.
+  rpc GetLog(Connection)                                 returns (data.log.Log)        {}
+
+  // Gets a stream of the available logs, this should be preferred over
+  // `GetLog` when possible.
+  rpc GetLogs(Connection)                                returns (stream data.log.Log) {}
+
+  // Gets the current details about the server.
+  rpc GetServerDetails(google.protobuf.Empty)            returns (ServerDetails)       {}
+
+  // Registers a new front-end connection to a server instance and returns the
+  // `Connection` message with a `uuid`.
+  rpc RegisterClient(google.protobuf.Empty)              returns (Connection)          {}
+
+  // Registers an already pre-existing connection to a server instance using an
+  // already generated `uuid` supplied in the `Connection`. Servers should
+  // verify that the supplied `uuid` is, in fact, a valid hyphenated v4 UUID.
+  // Returns a boolean whether or not the registration was succesful.
+  rpc RegisterExistingClient(Connection)                 returns (RequestResult)       {}
+}
+
+// LogClient is the service that needs to be implemented by log servers so
+// they can determine how the logs are stored when they are received by the
+// server. Loggers must only use this service as a client.
+service LogClient {
+  // Sends a single log. Should only be used in cases where log batching is
+  // not possible or not determinable.
+  rpc SendLog(data.log.Log)         returns (RequestResult) {}
+
+  // Sends a stream of logs. Should generally be preferred over `SendLog` as
+  // it allows for batch sending of `Log`s and _should_ be more efficient on
+  // resources.
+  rpc SendLogs(stream data.log.Log) returns (RequestResult) {}
+}
+

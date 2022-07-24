@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import glob as g
+import os
+import sys
+
+sources = g.glob(f"{sys.argv[1]}/*.proto")
+outputs = set()
+
+for source in sources:
+    prefix = source[:len(source)-len('.proto')]
+    if "cc_service" not in source:
+        # outputs.add("@BASENAME@.pb.cc")
+        # outputs.add("@BASENAME@.pb.h")
+        outputs.add(os.path.basename(f"{prefix}.pb.cc"))
+        outputs.add(os.path.basename(f"{prefix}.pb.h"))
+    else:
+        # outputs.add("@BASENAME@.grpc.pb.cc")
+        # outputs.add("@BASENAME@.grpc.pb.h")
+        outputs.add(os.path.basename(f"{prefix}.grpc.pb.cc"))
+        outputs.add(os.path.basename(f"{prefix}.grpc.pb.h"))
+
+for source in outputs:
+    print(source)
